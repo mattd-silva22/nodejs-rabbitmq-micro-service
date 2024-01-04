@@ -1,7 +1,9 @@
 export class OrderNotCreated extends Error {
-  constructor(message: string | string[]) {
+  erros: string[];
+  constructor(message: string, erros: string[]) {
     super("Order not created");
-    this.name = "OrderNotFound";
-    this.message = message.toString();
+    this.name = "OrderNotCreated";
+    this.message = message;
+    this.erros = erros;
   }
 }

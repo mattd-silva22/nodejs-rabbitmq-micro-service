@@ -1,14 +1,25 @@
 import { Router } from "express";
 import { OrderController } from "./order.controller";
-class OrderRouter {
-  public router = Router();
-  private orderController = new OrderController();
+
+interface IOrderRouter {
+  getRouter(): Router;
+}
+export class OrderRouter implements IOrderRouter {
+  private router: Router;
+  private orderController: OrderController;
 
   constructor() {
+    this.router = Router();
+    this.orderController = new OrderController();
     this.setupRoutes();
   }
 
   private setupRoutes(): void {
-    this.router.post("/", this.orderController.create);
+    this.router.post("/create", this.orderController.create);
+    this.router.get("/", this.orderController.hello);
+  }
+
+  public getRouter(): Router {
+    return this.router;
   }
 }
