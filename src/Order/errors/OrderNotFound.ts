@@ -1,7 +1,9 @@
 export class OrderNotFound extends Error {
-  constructor() {
+  erros: string[];
+  constructor(message: string, erros: string[]) {
     super("Order not found");
     this.name = "OrderNotFound";
-    this.message = "Order not found in database";
+    this.message = message;
+    this.erros = erros;
   }
 }

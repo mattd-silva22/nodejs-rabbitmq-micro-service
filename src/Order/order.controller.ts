@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { OrderNotCreated } from "./errors/OrderNotCreated";
 import { OrderService } from "./order.service";
+import { CreateOrderFail } from "./errors/CreateOrderFail";
+import { OrderNotFound } from "./errors/OrderNotFound";
 
 const orderService = new OrderService();
 export class OrderController {
@@ -27,14 +29,42 @@ export class OrderController {
       const err = new OrderNotCreated("Not able to create new order", errors);
       return res.status(400).json(err);
     } else {
-      const newOrder = await orderService.create({
-        productId: productId,
-        costumerId: costumerId,
-      });
+      orderService
+        .create({
+          productId: productId,
+          costumerId: costumerId,
+        })
+        .then((newOrder) => {
+          console.log(newOrder);
 
-      console.log(newOrder);
+          return res.status(201).send(newOrder);
+        })
+        .catch((err) => {
+          const error = new CreateOrderFail("Order creation failed", [err]);
+          return res.status(400).send(error);
+        });
+    }
+  }
 
-      return res.status(201).send(newOrder);
+  async findOne(req: Request, res: Response) {
+    const { id } = req.params;
+    const erros = [];
+    if (!id) {
+      erros.push("Id is required");
+    }
+
+    if (erros.length > 0) {
+      const err = new OrderNotFound("Order not found", erros);
+      res.status(404).send(err);
+    } else {
+      orderService
+        .findOne(id)
+        .then((order) => {
+          return res.status(200).send(order);
+        })
+        .catch((err) => {
+          return res.status(400).send(err);
+        });
     }
   }
 }

@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { OrderController } from "./order.controller";
+import { AuthorizationMiddleware } from "../middleware/authorization.middleware";
 
 interface IOrderRouter {
   getRouter(): Router;
@@ -11,7 +12,13 @@ export class OrderRouter implements IOrderRouter {
   constructor() {
     this.router = Router();
     this.orderController = new OrderController();
+    this.setupMiddlewares();
     this.setupRoutes();
+  }
+
+  private setupMiddlewares(): void {
+    const authMiddleware = new AuthorizationMiddleware();
+    this.router.use(authMiddleware.checkAuthorization);
   }
 
   private setupRoutes(): void {

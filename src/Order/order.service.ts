@@ -1,6 +1,7 @@
 import { getRandomNumber } from "../utils/getRandomNumber.utils";
 import { Order } from "./entities/order";
 import { Request, Response } from "express";
+import { OrderStatus } from "./types/OrdersStatus.type";
 
 export class OrderService {
   async create(data: {
@@ -11,19 +12,34 @@ export class OrderService {
     const order = new Order(productId, costumerId);
 
     // fake a database insert
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
+      const timer = getRandomNumber(15, 250);
+
       setTimeout(() => {
-        resolve({
-          id: order.id,
-          productId: order.productId,
-          costumerId: order.costumerId,
-          status: order.status,
-        });
-      }, getRandomNumber(15, 250));
+        if (timer < 225) {
+          resolve({
+            id: order.id,
+            productId: order.productId,
+            costumerId: order.costumerId,
+            status: order.status,
+          });
+        } else {
+          reject("Service is not available");
+        }
+      }, timer);
     });
   }
 
-  private async addQueue(order: Order): Promise<void> {
+  async findOne(id: string): Promise<Order> {
+    return {
+      id: id,
+      productId: "123",
+      costumerId: "456",
+      status: OrderStatus.IN_PROGRESS,
+    };
+  }
+
+  private async addToOrderQueue(order: Order): Promise<void> {
     // add order to queue
     console.log("Order added to queue");
   }
