@@ -1,0 +1,14 @@
+{
+    "preset": "ts-jest",
+    "testEnviroment": "node",
+    "modulePathIgnorePatterns": [
+        "/dist/",
+        "/node_modules/"
+    ],
+    "collectCoverageFrom": [
+        "src/**/*.ts"
+    ],
+    "modulePaths": [
+        "<rootDir>/src/"
+    ]
+}

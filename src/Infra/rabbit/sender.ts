@@ -5,6 +5,16 @@ interface ISender {
   message: string;
 }
 
+export class Rabbit {
+  constructor() {}
+
+  static async connect() {
+    const connection = await amqp.connect("amqp://localhost");
+    const channel = await connection.createChannel();
+    return channel;
+  }
+}
+
 export class Sender implements ISender {
   readonly exchangeName: string;
   readonly message: string;

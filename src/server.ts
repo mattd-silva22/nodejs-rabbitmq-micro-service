@@ -1,10 +1,11 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import { OrderRouter } from "./Order/order.router";
-import { OrderController } from "./Order/order.controller";
+import http from "http";
 
 export class Server {
   private app = express();
+  private server!: http.Server;
 
   private init(): void {
     console.log("Server is starting...");
@@ -29,8 +30,18 @@ export class Server {
 
   public start(port: number) {
     this.init();
-    this.app.listen(port, () => {
+    this.server = this.app.listen(port, () => {
       console.log(`Server listening on port ${port}`);
+    });
+  }
+
+  public getApp(): express.Application {
+    return this.app;
+  }
+
+  public stop(): void {
+    this.server.close(() => {
+      console.log("Server stopped");
     });
   }
 }
