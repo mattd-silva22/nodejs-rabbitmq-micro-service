@@ -3,9 +3,10 @@ import { Order } from "./entities/order";
 import { Request, Response } from "express";
 import { OrderStatus } from "./types/OrdersStatus.type";
 import { ErrorsTypes } from "../core/errors/types/errors.type";
+import { OrderRepository } from "../shared/database/repositories/orders.repository";
 
 export class OrderService {
-  orderService = new OrderService();
+  orderRepository = new OrderRepository();
 
   async create(data: {
     productId: string;
@@ -14,7 +15,18 @@ export class OrderService {
     const { productId, costumerId } = data;
     const order = new Order(productId, costumerId);
 
-    // fake a database insert
+    const erros = [];
+
+    this.orderRepository.create({
+      data: {
+        orderId: order.id,
+        productId: order.productId,
+        costumerId: order.costumerId,
+        status: order.status,
+      },
+    });
+
+    // fake in queue
     return new Promise((resolve, reject) => {
       const timer = getRandomNumber(15, 250);
 
@@ -40,6 +52,10 @@ export class OrderService {
       costumerId: "456",
       status: OrderStatus.IN_PROGRESS,
     };
+  }
+
+  async cancel(id: string): Promise<void> {
+    return;
   }
 
   private async addToOrderQueue(order: Order): Promise<void> {

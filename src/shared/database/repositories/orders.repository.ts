@@ -18,4 +18,8 @@ export class OrderRepository {
   update(updateDto: Prisma.OrdersUpdateArgs) {
     return this.prisma.orders.update(updateDto);
   }
+
+  create(createDto: Prisma.OrdersCreateArgs) {
+    return this.prisma.orders.create(createDto);
+  }
 }

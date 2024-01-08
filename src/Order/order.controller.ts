@@ -65,14 +65,7 @@ export class OrderController {
         .status(HttpStatusCode.BadRequest)
         .send(new OrderNotFound("Order not found", erros));
     } else {
-      orderService
-        .findOne(id)
-        .then((order) => {
-          return res.status(HttpStatusCode.Ok).send(order);
-        })
-        .catch((err) => {
-          return res.status(HttpStatusCode.NotFound).send(err);
-        });
+      return res.status(HttpStatusCode.NotFound).send("fail");
     }
   }
 }
