@@ -3,6 +3,7 @@ import { OrderNotCreated } from "./errors/OrderNotCreated";
 import { OrderService } from "./order.service";
 import { CreateOrderFail } from "./errors/CreateOrderFail";
 import { OrderNotFound } from "./errors/OrderNotFound";
+import { HttpStatusCode } from "axios";
 
 const orderService = new OrderService();
 export class OrderController {
@@ -13,8 +14,11 @@ export class OrderController {
   }
 
   hello(req: Request, res: Response) {
-    return res.status(200).send("Hello World! from order controller");
+    return res
+      .status(HttpStatusCode.Ok)
+      .send("Hello World! from order controller");
   }
+
   async create(req: Request, res: Response) {
     const { productId, costumerId } = req.body;
     const errors = [];
@@ -26,8 +30,9 @@ export class OrderController {
       errors.push("Costumer id is required");
     }
     if (errors.length > 0) {
-      const err = new OrderNotCreated("Not able to create new order", errors);
-      return res.status(400).json(err);
+      return res
+        .status(HttpStatusCode.BadRequest)
+        .json(new OrderNotCreated("Not able to create new order", errors));
     } else {
       orderService
         .create({
@@ -37,11 +42,12 @@ export class OrderController {
         .then((newOrder) => {
           console.log(newOrder);
 
-          return res.status(201).send(newOrder);
+          return res.status(HttpStatusCode.Created).send(newOrder);
         })
         .catch((err) => {
-          const error = new CreateOrderFail("Order creation failed", [err]);
-          return res.status(400).send(error);
+          return res
+            .status(HttpStatusCode.BadGateway)
+            .send(new CreateOrderFail("Order creation failed", [err]));
         });
     }
   }
@@ -49,21 +55,23 @@ export class OrderController {
   async findOne(req: Request, res: Response) {
     const { id } = req.params;
     const erros = [];
+
     if (!id) {
       erros.push("Id is required");
     }
 
     if (erros.length > 0) {
-      const err = new OrderNotFound("Order not found", erros);
-      res.status(404).send(err);
+      res
+        .status(HttpStatusCode.BadRequest)
+        .send(new OrderNotFound("Order not found", erros));
     } else {
       orderService
         .findOne(id)
         .then((order) => {
-          return res.status(200).send(order);
+          return res.status(HttpStatusCode.Ok).send(order);
         })
         .catch((err) => {
-          return res.status(400).send(err);
+          return res.status(HttpStatusCode.NotFound).send(err);
         });
     }
   }

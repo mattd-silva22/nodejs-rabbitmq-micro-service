@@ -1,20 +1,18 @@
-import request from "supertest";
 import { Server } from "../../../server";
 import supertest from "supertest";
 
 const expressServer = new Server();
 
-beforeAll(() => {
-  expressServer.start(5500);
-});
-
-afterAll(() => {
-  expressServer.stop();
-});
-
-const server = supertest(expressServer.getApp());
-
 describe("Testing create order endpoint", () => {
+  beforeEach(() => {
+    expressServer.start(5500);
+  });
+
+  afterEach(() => {
+    expressServer.stop();
+  });
+
+  const server = supertest(expressServer.getApp());
   it("Should return 201 when order is created", async () => {
     const response = await server
       .post("/order/create")

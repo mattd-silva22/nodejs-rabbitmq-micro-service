@@ -2,8 +2,11 @@ import { getRandomNumber } from "../utils/getRandomNumber.utils";
 import { Order } from "./entities/order";
 import { Request, Response } from "express";
 import { OrderStatus } from "./types/OrdersStatus.type";
+import { ErrorsTypes } from "../core/errors/types/errors.type";
 
 export class OrderService {
+  orderService = new OrderService();
+
   async create(data: {
     productId: string;
     costumerId: string;
@@ -24,13 +27,13 @@ export class OrderService {
             status: order.status,
           });
         } else {
-          reject("Service is not available");
+          reject(ErrorsTypes.SERVICE_UNAVAILABLE);
         }
       }, timer);
     });
   }
 
-  async findOne(id: string): Promise<Order> {
+  async findUnique(id: string): Promise<Order> {
     return {
       id: id,
       productId: "123",

@@ -8,7 +8,7 @@ interface IOrder {
 }
 
 export class Order implements IOrder {
-  readonly id: string;
+  id: string;
   status: OrderStatus;
   costumerId: string;
   productId: string;

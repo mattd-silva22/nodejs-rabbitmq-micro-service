@@ -40,8 +40,7 @@ export class Server {
   }
 
   public stop(): void {
-    this.server.close(() => {
-      console.log("Server stopped");
-    });
+    this.server.close();
+    console.log("Server stopped");
   }
 }
