@@ -17,7 +17,7 @@ export class OrderService {
 
     const erros = [];
 
-    this.orderRepository.create({
+    await this.orderRepository.create({
       data: {
         orderId: order.id,
         productId: order.productId,
