@@ -40,8 +40,6 @@ export class OrderController {
           costumerId: costumerId,
         })
         .then((newOrder) => {
-          console.log(newOrder);
-
           return res.status(HttpStatusCode.Created).send(newOrder);
         })
         .catch((err) => {
@@ -53,9 +51,9 @@ export class OrderController {
   }
 
   async findOne(req: Request, res: Response) {
-    const { id } = req.params;
-    const erros = [];
+    const { id } = req.query;
 
+    const erros = [];
     if (!id) {
       erros.push("Id is required");
     }
@@ -65,7 +63,14 @@ export class OrderController {
         .status(HttpStatusCode.BadRequest)
         .send(new OrderNotFound("Order not found", erros));
     } else {
-      return res.status(HttpStatusCode.NotFound).send("fail");
+      orderService
+        .findUnique(id as string)
+        .then((order) => {
+          res.status(HttpStatusCode.Ok).send(order);
+        })
+        .catch((err) => {
+          res.status(HttpStatusCode.BadRequest).send(err);
+        });
     }
   }
 }

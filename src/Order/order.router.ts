@@ -22,8 +22,9 @@ export class OrderRouter implements IOrderRouter {
   }
 
   private setupRoutes(): void {
-    this.router.post("/create", this.orderController.create);
-    this.router.get("/", this.orderController.hello);
+    this.router.post("/", this.orderController.create);
+    this.router.get("/", this.orderController.findOne);
+    this.router.get("/hello", this.orderController.hello);
   }
 
   public getRouter(): Router {

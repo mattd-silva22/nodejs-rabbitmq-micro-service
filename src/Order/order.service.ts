@@ -2,50 +2,38 @@ import { getRandomNumber } from "../utils/getRandomNumber.utils";
 import { Order } from "./entities/order";
 import { Request, Response } from "express";
 import { OrderStatus } from "./types/OrdersStatus.type";
-import { ErrorsTypes } from "../core/errors/types/errors.type";
-import { OrderRepository } from "../shared/database/repositories/orders.repository";
+import { OrderRepository } from "./orders.repository";
+import { ErrorsTypes } from "../Core/errors/types/errors.type";
 
 export class OrderService {
   orderRepository = new OrderRepository();
 
-  async create(data: {
-    productId: string;
-    costumerId: string;
-  }): Promise<Order> {
+  async create(data: { productId: string; costumerId: string }): Promise<any> {
     const { productId, costumerId } = data;
     const order = new Order(productId, costumerId);
 
     const erros = [];
 
-    await this.orderRepository.create({
-      data: {
-        orderId: order.id,
-        productId: order.productId,
-        costumerId: order.costumerId,
-        status: order.status,
-      },
-    });
+    const insetResult = await this.orderRepository.create(order);
 
-    // fake in queue
-    return new Promise((resolve, reject) => {
-      const timer = getRandomNumber(15, 250);
-
-      setTimeout(() => {
-        if (timer < 225) {
-          resolve({
-            id: order.id,
-            productId: order.productId,
-            costumerId: order.costumerId,
-            status: order.status,
-          });
-        } else {
-          reject(ErrorsTypes.SERVICE_UNAVAILABLE);
+    return new Promise(async (resolve, reject) => {
+      if (insetResult) {
+        try {
+          const response = await this.publishToOrderQueue(order);
+          resolve(response);
+        } catch (err) {
+          reject(err);
         }
-      }, timer);
+      } else {
+        reject(ErrorsTypes.UNKOOWN_ERROR);
+      }
     });
   }
 
+  // fake in queue
+
   async findUnique(id: string): Promise<Order> {
+    const result = await this.orderRepository.findUnique(id);
     return {
       id: id,
       productId: "123",
@@ -58,8 +46,16 @@ export class OrderService {
     return;
   }
 
-  private async addToOrderQueue(order: Order): Promise<void> {
-    // add order to queue
-    console.log("Order added to queue");
+  private async publishToOrderQueue(order: Order): Promise<Order> {
+    return new Promise((resolve, reject) => {
+      const timer = getRandomNumber(15, 250);
+      setTimeout(() => {
+        if (timer < 235) {
+          resolve({ ...order });
+        } else {
+          reject(ErrorsTypes.SERVICE_UNAVAILABLE);
+        }
+      }, timer);
+    });
   }
 }
